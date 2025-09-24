@@ -13,8 +13,14 @@ import os
 # Add the parent directory to sys.path to import from models.py
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
-from models import ReasoningStepType
-from .exceptions import LensError, SteeringError
+try:
+    from models import ReasoningStepType
+except ImportError:
+    from .models import ReasoningStepType
+try:
+    from .exceptions import LensError, SteeringError
+except ImportError:
+    from exceptions import LensError, SteeringError
 
 
 class LensSteeringManager:

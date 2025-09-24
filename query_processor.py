@@ -12,7 +12,10 @@ import os
 # Add the parent directory to sys.path to import from models.py
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
-from .exceptions import LensError, ProcessingError
+try:
+    from .exceptions import LensError, ProcessingError
+except ImportError:
+    from exceptions import LensError, ProcessingError
 
 
 class LensQueryProcessor:
