@@ -1,6 +1,6 @@
 # Lens Reasoning SDK
 
-A Python SDK for the Lens Reasoning System focused on query processing and reasoning capabilities. For steering directives and advanced reasoning management, use the integrated Lens UI overlay.
+A Python SDK for the Lens Reasoning System focused on query processing and reasoning capabilities. For steering directives and advanced reasoning management, use the integrated Lens UI overlay (Cmd/Ctrl + Shift + T).
 
 ## Installation
 
@@ -48,7 +48,7 @@ Answer: [reasoning result...]
 Contract ID: [contract-id]
 
 To add steering directives and modify reasoning:
-1. Press Ctrl/Cmd + Shift + L to open the Lens UI overlay
+1. Press Cmd/Ctrl + Shift + T to open the Lens UI overlay
 2. Navigate to your contract using ID: [contract-id]
 3. Add steering directives through the visual interface
 4. Re-run reasoning with your custom directives
@@ -61,7 +61,7 @@ To add steering directives and modify reasoning:
 This SDK provides:
 
 1. **LensQueryProcessor** - For query processing and reasoning
-2. **Lens UI Integration** - For steering directives management through visual overlay (Ctrl/Cmd + Shift + L)
+2. **Lens UI Integration** - For steering directives management through visual overlay (Cmd/Ctrl + Shift + T)
 
 ## Quick Start
 
@@ -92,7 +92,7 @@ try:
 
     # For steering directives, use the UI overlay
     print(f"\nTo modify reasoning with steering directives:")
-    print(f"Press Ctrl/Cmd + Shift + L and navigate to contract: {result['contract_id']}")
+    print(f"Press Cmd/Ctrl + Shift + T and navigate to contract: {result['contract_id']}")
 
 except ProcessingError as e:
     print(f"Processing failed: {e}")
@@ -106,7 +106,7 @@ Instead of programmatic steering directives, use the **Lens UI Overlay** for a v
 
 1. **Run your query** using the SDK above
 2. **Note the Contract ID** from the result
-3. **Press `Ctrl/Cmd + Shift + L`** to open the Lens UI overlay
+3. **Press `Cmd/Ctrl + Shift + T`** to open the Lens UI overlay
 4. **Navigate to your contract** using the Contract ID
 5. **Add steering directives** through the visual interface
 6. **Re-run reasoning** with your custom directives applied
@@ -157,7 +157,7 @@ The SDK integrates with the Lens UI overlay for advanced steering directives man
 ```python
 # After getting a contract_id from your query
 print(f"Contract ID: {contract_id}")
-print("Press Ctrl/Cmd + Shift + L to open Lens UI overlay")
+print("Press Cmd/Ctrl + Shift + T to open Lens UI overlay")
 ```
 
 #### UI Features Available:
@@ -168,7 +168,7 @@ print("Press Ctrl/Cmd + Shift + L to open Lens UI overlay")
 - **Impact Analysis** - See how directives changed the reasoning
 
 #### Keyboard Shortcuts:
-- `Ctrl/Cmd + Shift + L` - Open/close Lens UI overlay
+- `Cmd/Ctrl + Shift + T` - Open/close Lens UI overlay
 - Navigate to your contract using the Contract ID from SDK results
 
 ## Complete Working Example
@@ -209,7 +209,7 @@ def test_sdk_with_ui():
 
         # Step 3: Provide UI instructions for steering
         print(f"\n🎯 Next Steps - Use Lens UI for Steering:")
-        print(f"1. Press Ctrl/Cmd + Shift + L to open the Lens UI overlay")
+        print(f"1. Press Cmd/Ctrl + Shift + T to open the Lens UI overlay")
         print(f"2. Navigate to contract: {contract_id}")
         print(f"3. Review the {len(trace['steps'])} reasoning steps")
         print(f"4. Add steering directives through the visual interface")
@@ -293,7 +293,7 @@ python test_sdk.py
 - httpx>=0.25.0
 - pydantic>=2.0.0
 - Access to a running Lens Reasoning System backend server
-- Lens UI overlay installed for steering directives (Ctrl/Cmd + Shift + L)
+- Lens UI overlay installed for steering directives (Cmd/Ctrl + Shift + T)
 
 ## Server Configuration
 
@@ -305,7 +305,7 @@ Ensure your Lens Reasoning System backend is:
 ## UI Overlay Setup
 
 The Lens UI overlay provides the visual interface for steering directives:
-- **Keyboard Shortcut**: `Ctrl/Cmd + Shift + L`
+- **Keyboard Shortcut**: `Cmd/Ctrl + Shift + T`
 - **Features**: Contract browser, reasoning trace viewer, steering directive editor
 - **Integration**: Seamlessly works with Contract IDs from the SDK
 
