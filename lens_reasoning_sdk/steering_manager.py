@@ -32,7 +32,7 @@ class LensSteeringManager:
     the reasoning with applied directives.
 
     Example usage:
-        manager = LensSteeringManager("http://localhost:8001")
+        manager = LensSteeringManager("https://api.tupl.xyz")
 
         # Add steering directive to a specific step
         manager.add_steering_directive(
@@ -48,7 +48,7 @@ class LensSteeringManager:
         print(f"Updated answer: {updated_result['final_answer']}")
     """
 
-    def __init__(self, base_url: str = "http://localhost:8001", timeout: int = 300):
+    def __init__(self, base_url: str = "https://api.tupl.xyz", timeout: int = 300):
         """
         Initialize the steering manager
 

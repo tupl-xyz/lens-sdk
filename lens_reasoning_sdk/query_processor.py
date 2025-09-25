@@ -26,7 +26,7 @@ class LensQueryProcessor:
     and retrieving results. It provides a clean interface for basic reasoning tasks.
 
     Example usage:
-        processor = LensQueryProcessor("http://localhost:8001")
+        processor = LensQueryProcessor("https://api.tupl.xyz")
 
         # Process a query
         result = processor.process_query("What are the implications of AI in healthcare?")
@@ -38,7 +38,7 @@ class LensQueryProcessor:
         print(f"Confidence: {contract['confidence_overall']}")
     """
 
-    def __init__(self, base_url: str = "http://localhost:8001", timeout: int = 300):
+    def __init__(self, base_url: str = "https://api.tupl.xyz", timeout: int = 300):
         """
         Initialize the query processor
 

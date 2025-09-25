@@ -1,87 +1,27 @@
 # Lens Reasoning SDK
 
-A Python SDK for the Lens Reasoning System focused on query processing and reasoning capabilities. For steering directives and advanced reasoning management, use the integrated Lens UI overlay (Cmd/Ctrl + Shift + T).
+A Python SDK for the Lens Reasoning System that provides query processing and reasoning capabilities.
 
 ## Installation
-
-### Option 1: Install from Source (Recommended)
-
-```bash
-# Clone or navigate to the SDK directory
-cd /path/to/lens-sdk
-
-# Install in editable mode
-pip install -e .
-```
-
-### Option 2: Install from PyPI (if published)
 
 ```bash
 pip install lens-reasoning-sdk
 ```
 
-### Prerequisites
+## Prerequisites
 
 - Python 3.8+
-- A running Lens Reasoning System backend server (default: `http://localhost:8001`)
-
-## Testing Your Installation
-
-Run the included test script to verify everything works:
-
-```bash
-# Navigate to the SDK directory
-cd /path/to/lens-sdk
-
-# Run the test script
-python test_sdk.py
-```
-
-Expected output:
-```
-Testing LensQueryProcessor...
-✅ Query processed successfully
-Contract ID: [contract-id]
-Answer: [reasoning result...]
-
-🎯 Steering Directives Management:
-Contract ID: [contract-id]
-
-To add steering directives and modify reasoning:
-1. Press Cmd/Ctrl + Shift + T to open the Lens UI overlay
-2. Navigate to your contract using ID: [contract-id]
-3. Add steering directives through the visual interface
-4. Re-run reasoning with your custom directives
-
-✅ SDK test completed - Use the UI for advanced steering features!
-```
-
-## SDK Overview
-
-This SDK provides:
-
-1. **LensQueryProcessor** - For query processing and reasoning
-2. **Lens UI Integration** - For steering directives management through visual overlay (Cmd/Ctrl + Shift + T)
+- Internet access to the Lens Reasoning System production API
 
 ## Quick Start
 
-### Query Processing
-
-Use `LensQueryProcessor` for reasoning tasks:
-
 ```python
-import sys
-import os
-
-# Add SDK directory to path (if not installed via pip)
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-from query_processor import LensQueryProcessor
-from exceptions import ProcessingError
+from lens_reasoning_sdk import LensQueryProcessor
+from lens_reasoning_sdk.exceptions import ProcessingError
 
 try:
     # Initialize the query processor
-    processor = LensQueryProcessor("http://localhost:8001")
+    processor = LensQueryProcessor()
 
     # Process a query
     result = processor.process_query("What are the implications of AI in healthcare?")
@@ -90,224 +30,277 @@ try:
     print(f"Confidence: {result['confidence_overall']}")
     print(f"Contract ID: {result['contract_id']}")
 
-    # For steering directives, use the UI overlay
-    print(f"\nTo modify reasoning with steering directives:")
-    print(f"Press Cmd/Ctrl + Shift + T and navigate to contract: {result['contract_id']}")
-
 except ProcessingError as e:
     print(f"Processing failed: {e}")
 finally:
     processor.close()
 ```
 
-### Steering Directives Management
+## Available Methods
 
-Instead of programmatic steering directives, use the **Lens UI Overlay** for a visual, interactive experience:
+- `process_query(query, **kwargs)` - Process a query through the reasoning system
+- `get_contract(contract_id)` - Get complete contract details
+- `get_reasoning_trace(contract_id)` - Get detailed reasoning trace
+- `list_contracts(workflow_id=None, limit=20)` - List existing contracts
 
-1. **Run your query** using the SDK above
-2. **Note the Contract ID** from the result
-3. **Press `Cmd/Ctrl + Shift + T`** to open the Lens UI overlay
-4. **Navigate to your contract** using the Contract ID
-5. **Add steering directives** through the visual interface
-6. **Re-run reasoning** with your custom directives applied
+## API Documentation
 
-#### Benefits of UI-Based Steering:
-- 🎯 **Visual Interface** - See reasoning steps and add directives intuitively
-- 🔄 **Real-time Feedback** - Immediate preview of directive impact
-- 📊 **Advanced Analytics** - Detailed reasoning trace visualization
-- ⚡ **Quick Iteration** - Easily modify and test different steering approaches
+The Lens Reasoning SDK interfaces with a comprehensive REST API that provides advanced AI reasoning capabilities. All endpoints are available at `https://api.tupl.xyz/lens/`.
 
-## API Reference
+### Query Processing
 
-### LensQueryProcessor
+#### Process Query
+Process a query through the Lens Reasoning system and receive detailed analysis.
 
-#### Constructor
-```python
-LensQueryProcessor(base_url="http://localhost:8001", timeout=300)
-```
-
-#### Methods
-
-##### `process_query(query, **kwargs)`
-Process a query through the reasoning system.
+**Endpoint:** `POST /lens/reasoning/process`
 
 **Parameters:**
-- `query` (str): The question or problem to reason about
-- `initial_docs` (List[str], optional): Initial documents to include
-- `reasoning_mode` (str): "comprehensive", "focused", or "policy_guided"
-- `workflow_id` (str, optional): Workflow identifier
-- `workflow_name` (str, optional): Workflow name
+- `query` (str, required): The question or problem to reason about
+- `initial_docs` (List[str], optional): Initial documents to include in context
+- `reasoning_mode` (str, optional): Reasoning mode - "comprehensive", "focused", or "policy_guided" (default: "comprehensive")
+- `workflow_id` (str, optional): Optional workflow identifier
+- `workflow_name` (str, optional): Optional workflow name
 
-**Returns:** Dictionary with reasoning results
+**Returns:**
+- `success` (bool): Processing success status
+- `contract_id` (str): Unique identifier for the reasoning session
+- `final_answer` (str): The AI-generated answer to your query
+- `confidence_overall` (float): Overall confidence score (0.0-1.0)
+- `execution_time_ms` (int): Processing time in milliseconds
+- `total_steps` (int): Number of reasoning steps performed
+- `knowledge_gaps` (List[str]): Identified gaps in available knowledge
 
-##### `get_contract(contract_id)`
-Get complete contract details.
+### Contract Management
 
-##### `get_reasoning_trace(contract_id)`
-Get detailed step-by-step reasoning trace.
+#### List Contracts
+Retrieve a list of previously processed reasoning contracts.
 
-##### `list_contracts(workflow_id=None, limit=20)`
-List existing contracts with optional filtering.
+**Endpoint:** `GET /lens/contracts`
 
-### Lens UI Overlay Integration
+**Parameters:**
+- `workflow_id` (str, optional): Filter contracts by workflow ID
+- `limit` (int, optional): Maximum number of contracts to return (default: 20)
 
-The SDK integrates with the Lens UI overlay for advanced steering directives management:
+**Returns:** List of contract summaries including contract ID, original query, final answer, confidence score, and creation timestamp.
 
-#### Opening the UI Overlay
-```python
-# After getting a contract_id from your query
-print(f"Contract ID: {contract_id}")
-print("Press Cmd/Ctrl + Shift + T to open Lens UI overlay")
+#### Get Contract Details
+Retrieve comprehensive details for a specific reasoning contract.
+
+**Endpoint:** `GET /lens/contracts/{contract_id}`
+
+**Parameters:**
+- `contract_id` (str, required): The contract identifier
+
+**Returns:** Complete contract information including reasoning trace, confidence assessments, knowledge gaps, directive change records, and execution metadata.
+
+### Reasoning Analysis
+
+#### Get Reasoning Trace
+Access detailed step-by-step reasoning analysis with evidence and decision breakdowns.
+
+**Endpoint:** `GET /lens/reasoning/trace/{contract_id}`
+
+**Parameters:**
+- `contract_id` (str, required): The contract identifier
+
+**Returns:** Comprehensive reasoning trace including:
+- Individual reasoning steps with decisions and confidence levels
+- Evidence sources and relevance scores
+- Applied steering directives and their impact
+- Context summaries from knowledge base, tools, and external sources
+
+### Advanced Steering Features
+
+The API supports advanced steering directives for controlling and customizing the reasoning process:
+
+#### Configure Step Directives
+Add custom guidance to specific reasoning steps.
+
+**Endpoint:** `POST /lens/reasoning/{contract_id}/configure-step-directives`
+
+**Parameters:**
+- `contract_id` (str, required): The contract identifier
+- Request body:
+```json
+{
+  "contract_id": "string",
+  "step_directives": [
+    {
+      "step_id": "string",
+      "directives": [
+        {
+          "target_step_types": ["problem_decomposition", "evidence_gathering"],
+          "priority": 8,
+          "guidance": "Focus specifically on peer-reviewed scientific studies",
+          "constraints": {},
+          "enforce_order": false
+        }
+      ]
+    }
+  ]
+}
 ```
 
-#### UI Features Available:
-- **Contract Browser** - View all your reasoning contracts
-- **Reasoning Trace Viewer** - Detailed step-by-step analysis
-- **Steering Directive Editor** - Visual interface for adding directives
-- **Re-run Controls** - Apply steering and re-execute reasoning
-- **Impact Analysis** - See how directives changed the reasoning
-
-#### Keyboard Shortcuts:
-- `Cmd/Ctrl + Shift + T` - Open/close Lens UI overlay
-- Navigate to your contract using the Contract ID from SDK results
-
-## Complete Working Example
-
-Copy this exact code to test the SDK with UI integration:
-
-```python
-import sys
-import os
-
-# Add current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-from query_processor import LensQueryProcessor
-from exceptions import ProcessingError
-
-def test_sdk_with_ui():
-    processor = None
-
-    try:
-        # Initialize the SDK
-        processor = LensQueryProcessor("http://localhost:8001")
-
-        # Step 1: Process a reasoning query
-        result = processor.process_query(
-            query="How can we reduce carbon emissions in urban transportation?",
-            reasoning_mode="comprehensive"
-        )
-
-        contract_id = result['contract_id']
-        print(f"✅ Query processed successfully!")
-        print(f"Contract ID: {contract_id}")
-        print(f"Initial answer: {result['final_answer'][:100]}...")
-
-        # Step 2: Get reasoning trace for reference
-        trace = processor.get_reasoning_trace(contract_id)
-        print(f"Reasoning steps: {len(trace['steps'])}")
-
-        # Step 3: Provide UI instructions for steering
-        print(f"\n🎯 Next Steps - Use Lens UI for Steering:")
-        print(f"1. Press Cmd/Ctrl + Shift + T to open the Lens UI overlay")
-        print(f"2. Navigate to contract: {contract_id}")
-        print(f"3. Review the {len(trace['steps'])} reasoning steps")
-        print(f"4. Add steering directives through the visual interface")
-        print(f"5. Re-run reasoning with your custom directives")
-
-        print(f"\n✅ SDK test completed - Use the UI overlay for advanced features!")
-
-    except ProcessingError as e:
-        print(f"❌ Processing failed: {e}")
-    except Exception as e:
-        print(f"❌ Unexpected error: {e}")
-    finally:
-        if processor:
-            processor.close()
-
-if __name__ == "__main__":
-    test_sdk_with_ui()
+**Returns:**
+```json
+{
+  "success": true,
+  "message": "Step directives configured successfully",
+  "steps_configured": 2,
+  "ready_to_apply": true
+}
 ```
 
-Save this as `sdk_ui_test.py` and run with: `python sdk_ui_test.py`
+#### Apply Directives
+Execute configured steering directives and re-run the reasoning process.
 
-## Running from Any Directory
+**Endpoint:** `POST /lens/reasoning/{contract_id}/apply-directives`
 
-To use this SDK from anywhere on your system:
-
-### Method 1: Install Globally
-```bash
-# Navigate to SDK directory
-cd /Users/aashishbharadwaj/lens/sdk/lens-sdk
-
-# Install globally
-pip install -e .
-
-# Now you can use from anywhere
-python -c "
-from query_processor import LensQueryProcessor
-processor = LensQueryProcessor('http://localhost:8001')
-print('✅ Global installation works!')
-processor.close()
-"
+**Parameters:**
+- `contract_id` (str, required): The contract identifier
+- Request body:
+```json
+{
+  "contract_id": "string",
+  "preserve_original_trace": true
+}
 ```
 
-### Method 2: Add to Python Path
-```python
-import sys
-import os
-
-# Add the SDK directory to your path
-sdk_path = '/Users/aashishbharadwaj/lens/sdk/lens-sdk'
-if sdk_path not in sys.path:
-    sys.path.insert(0, sdk_path)
-
-# Now import and use
-from query_processor import LensQueryProcessor
-from exceptions import ProcessingError
-
-# Get contract ID, then use Ctrl/Cmd + Shift + L for steering
+**Returns:**
+```json
+{
+  "success": true,
+  "message": "Directives applied and reasoning re-executed successfully",
+  "contract_id": "string",
+  "total_steps": 15,
+  "confidence_overall": 0.85,
+  "execution_time_ms": 2340,
+  "steps_with_directives": 3,
+  "final_answer": "Updated reasoning result with applied directives",
+  "directive_impact_summary": {
+    "total_directives_applied": 3,
+    "steps_modified": 2,
+    "confidence_change": 0.12,
+    "reasoning_path_changes": ["evidence_gathering", "synthesis"]
+  },
+  "directive_change_records": [
+    {
+      "step_id": "step_1",
+      "directive_applied": "Focus on peer-reviewed studies",
+      "original_decision": "Original reasoning",
+      "modified_decision": "Enhanced reasoning with directive guidance",
+      "impact_score": 0.8
+    }
+  ]
+}
 ```
 
-### Method 3: Copy Test Files
-Copy `test_sdk.py` to any directory and it will work without modification.
+#### Directive Status
+Check the status of configured steering directives.
 
-## Troubleshooting
+**Endpoint:** `GET /lens/reasoning/{contract_id}/directive-status`
 
-### Common Issues:
+**Parameters:**
+- `contract_id` (str, required): The contract identifier
 
-1. **ModuleNotFoundError**: Make sure your backend server is running on `http://localhost:8001`
-2. **Import Errors**: Use the exact import patterns shown above
-3. **Connection Refused**: Verify backend server is accessible
-
-### Verify Installation:
-```bash
-# Test basic functionality
-cd /Users/aashishbharadwaj/lens/sdk/lens-sdk
-python test_sdk.py
+**Returns:**
+```json
+{
+  "contract_id": "string",
+  "total_steps": 15,
+  "steps_with_directives": 3,
+  "step_statuses": [
+    {
+      "step_id": "step_1",
+      "step_type": "evidence_gathering",
+      "directives_count": 1,
+      "directives": [
+        {
+          "target_step_types": ["evidence_gathering"],
+          "priority": 8,
+          "guidance": "Focus on peer-reviewed studies",
+          "constraints": {},
+          "enforce_order": false
+        }
+      ]
+    }
+  ],
+  "has_pending_directives": true
+}
 ```
 
-## Requirements
+#### Clear Directives
+Remove all configured steering directives from a contract.
 
-- Python 3.8+
-- httpx>=0.25.0
-- pydantic>=2.0.0
-- Access to a running Lens Reasoning System backend server
-- Lens UI overlay installed for steering directives (Cmd/Ctrl + Shift + T)
+**Endpoint:** `DELETE /lens/reasoning/{contract_id}/clear-directives`
 
-## Server Configuration
+**Parameters:**
+- `contract_id` (str, required): The contract identifier
 
-Ensure your Lens Reasoning System backend is:
-- Running on `http://localhost:8001` (or modify base_url in code)
-- Accepting HTTP requests
-- Properly configured for reasoning operations
+**Returns:**
+```json
+{
+  "success": true,
+  "message": "All step directives cleared"
+}
+```
 
-## UI Overlay Setup
+#### Add Custom Steering Directive
+Create a custom steering directive template for reuse.
 
-The Lens UI overlay provides the visual interface for steering directives:
-- **Keyboard Shortcut**: `Cmd/Ctrl + Shift + T`
-- **Features**: Contract browser, reasoning trace viewer, steering directive editor
-- **Integration**: Seamlessly works with Contract IDs from the SDK
+**Endpoint:** `POST /lens/reasoning/add-steering-directive`
+
+**Parameters:**
+- Request body:
+```json
+{
+  "target_step_types": ["evidence_gathering", "synthesis"],
+  "priority": 7,
+  "guidance": "Prioritize recent research from the last 5 years",
+  "constraints": {
+    "time_limit": "5_years",
+    "source_types": ["academic", "peer_reviewed"]
+  },
+  "enforce_order": false
+}
+```
+
+**Returns:**
+```json
+{
+  "success": true,
+  "template_name": "custom_0"
+}
+```
+
+### Supported Reasoning Step Types
+
+The system performs analysis across 29 specialized reasoning step types:
+
+**Core Analysis:** Problem decomposition, fact extraction, evidence gathering, pattern recognition, hypothesis formation
+
+**Logical Operations:** Deductive reasoning, inductive reasoning, abductive reasoning, causal analysis, contradiction checking
+
+**Evaluation:** Evidence validation, confidence assessment, risk assessment, comparative analysis, quality verification
+
+**Synthesis:** Information synthesis, conclusion formation, recommendation generation, decision making
+
+**External Integration:** Tool invocation, knowledge retrieval, document analysis, web search
+
+**Meta-Reasoning:** Strategy planning, approach selection, step validation, error detection, course correction
+
+### Error Handling
+
+The API returns standard HTTP status codes:
+- `200 OK`: Successful operation
+- `404 Not Found`: Contract or resource not found
+- `500 Internal Server Error`: Processing failure
+
+Error responses include detailed error messages in the format: `{"detail": "error description"}`
+
+### Rate Limits and Usage
+
+The production API is designed for research and development use. For high-volume production deployments, please contact the development team for appropriate scaling and rate limit configurations.
 
 ## License
 
